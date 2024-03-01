@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include "gfa-ext.h"
 
 #define GFA_VERSION "0.5-r292-dirty"
 
@@ -30,6 +31,7 @@
   a vertex v in the graph g.
 */
 
+#ifndef GFA_EXT_L
 typedef struct {
 	uint64_t v_lv; // higher 32 bits: vertex_id; lower 32 bits: lv; packed together for sorting
 	uint32_t w;
@@ -37,6 +39,7 @@ typedef struct {
 	int32_t ov, ow;
 	uint64_t link_id:61, strong:1, del:1, comp:1; // link_id: a pair of dual arcs are supposed to have the same link_id
 } gfa_arc_t;
+#endif
 
 #define gfa_arc_head(a) ((uint32_t)((a).v_lv>>32))
 #define gfa_arc_tail(a) ((a).w)
@@ -46,6 +49,7 @@ typedef struct {
 #define gfa_arc_n(g, v) ((uint32_t)(g)->idx[(v)])
 #define gfa_arc_a(g, v) (&(g)->arc[(g)->idx[(v)]>>32])
 
+#ifndef GFA_EXT_AUX
 typedef struct {
 	uint32_t m_aux, l_aux;
 	uint8_t *aux;
@@ -59,7 +63,9 @@ typedef struct {
 	uint64_t *r; // start and end on each read
 	char **name;
 } gfa_utg_t;
+#endif
 
+#ifndef GFA_EXT_S
 typedef struct {
 	int32_t len;
 	uint32_t del:16, circ:16;
@@ -70,6 +76,7 @@ typedef struct {
 	gfa_utg_t *utg;
 	gfa_aux_t aux;
 } gfa_seg_t;
+#endif
 
 typedef struct {
 	int32_t len, snid, soff, rank;
@@ -82,6 +89,7 @@ typedef struct {
 	int32_t min, max, rank;
 } gfa_sseq_t;
 
+#ifndef GFA_EXT_W
 typedef struct {
 	const char *sample;
 	int32_t snid;
@@ -90,6 +98,7 @@ typedef struct {
 	uint32_t *v;
 	gfa_aux_t aux;
 } gfa_walk_t;
+#endif
 
 #define gfa_n_vtx(g) ((g)->n_seg << 1)
 
