@@ -10,6 +10,10 @@
 #include "kseq.h"
 KSTREAM_INIT(gzFile, gzread, 65536)
 
+#pragma weak gfa_parse_S
+#pragma weak gfa_parse_L
+#pragma weak gfa_parse_W
+
 /***********
  * Tag I/O *
  ***********/
