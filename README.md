@@ -1,20 +1,9 @@
 ## Getting Started
-```sh
-git clone https://github.com/lh3/gfatools
-cd gfatools && make
-# Extract a subgraph
-./gfatools view -l MTh4502 -r 1 test/MT.gfa > sub.gfa
-# Convert GFA to segment FASTA
-./gfatools gfa2fa test/MT.gfa > MT-seg.fa
-# Convert rGFA to stable FASTA or BED
-./gfatools gfa2fa -s test/MT.gfa > MT.fa
-./gfatools gfa2bed -m test/MT.gfa > MT.bed
+Compiling of the `example-usage` file. To use the extensions to the struct we need to also include `gfa-ext` files.
+```bash
+gcc -o eu example-usage.c gfa-io.c gfa-base.c gfa-ed.c kalloc.c gfa-ext.c -lz
 ```
 
-## Introduction
 
-gfatools is a set of tools for manipulating sequence graphs in the GFA or the
-[rGFA][rGFA] format. It has implemented parsing, subgraph and conversion to
-FASTA/BED. More functionality may be added in future.
-
+## Misc
 [rGFA]: https://github.com/lh3/gfatools/blob/master/doc/rGFA.md
