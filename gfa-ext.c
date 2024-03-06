@@ -4,8 +4,9 @@
 #include "gfa.h"
 #include "gfa-priv.h"
 
+int gfa_aux_parse(char *s, uint8_t **data, int *max);
+
 int gfa_parse_S(gfa_t *g, char *s) {
-//  fprintf(stderr, "[%s] gfa-ext\n", __func__);
   int i, is_ok = 0;
   char *p, *q, *seg = 0, *seq = 0, *rest = 0;
   uint32_t sid, len = 0;
@@ -162,8 +163,8 @@ int gfa_parse_L(gfa_t *g, char *s) {
 #ifdef GFA_EXT_L
       uint8_t *s_EX = gfa_aux_get(a->l_aux, a->aux, "EX");
       if (s_EX) {
-        arc->exons = realloc(arc->exons, strlen((char *)s_EX+1));
-        strcpy(arc->exons, (char *) s_EX+1);
+        arc->genes = realloc(arc->genes, strlen((char *)s_EX+1));
+        strcpy(arc->genes, (char *) s_EX+1);
         a->l_aux = gfa_aux_del(a->l_aux, a->aux, s_EX);
 
         /* Alternatively we could keep the string in a->aux 
@@ -181,7 +182,7 @@ int gfa_parse_L(gfa_t *g, char *s) {
          */
 
       } else {
-        arc->exons = '\0';
+        arc->genes = '\0';
       }
 #endif
       if (a->l_aux == 0) {
@@ -193,67 +194,4 @@ int gfa_parse_L(gfa_t *g, char *s) {
   return 0;
 }
 
-int gfa_parse_W(gfa_t *g, char *s) {
-//  fprintf(stderr, "[%s] gfa-ext\n", __func__);
-  char *p, *q, *ctg = 0, *sample = 0;
-  int32_t i, is_ok = 0;
-  char *rest;
-  gfa_walk_t t;
-  GFA_BZERO(&t, 1);
-  for (p = q = s + 2, i = 0;; ++p) {
-    t.sample = 0;
-    if (*p == 0 || *p == '\t') {
-      int32_t c = *p;
-      *p = 0;
-      if (i == 0) {
-        sample = q;
-      } else if (i == 1) {
-        t.hap = atoi(q);
-      } else if (i == 2) {
-        ctg = q;
-      } else if (i == 3) {
-        t.st = atol(q);
-      } else if (i == 4) {
-        t.en = atol(q);
-      } else if (i == 5) {
-        char *pp, *qq;
-        for (pp = q, t.n_v = 0; pp < p; ++pp)
-          if (*pp == '>' || *pp == '<')
-            t.n_v++;
-        GFA_MALLOC(t.v, t.n_v);
-        for (qq = q, pp = q + 1, t.n_v = 0; pp <= p; ++pp) {
-          if (pp == p || *pp == '>' || *pp == '<') {
-            int32_t a = *pp, seg;
-            *pp = 0;
-            seg = gfa_name2id(g, qq + 1);
-            if (seg >= 0) {
-              t.v[t.n_v++] = (uint32_t) seg << 1 | (*qq == '<');
-            } else {
-              if (gfa_verbose >= 2)
-                fprintf(stderr, "WARNING: failed to find segment '%s'\n", qq + 1);
-            }
-            *pp = a, qq = pp;
-          }
-        }
-        is_ok = 1, rest = c ? p + 1 : 0;
-        break;
-      }
-      q = p + 1, ++i;
-      if (c == 0) break;
-    }
-  }
-  if (is_ok) {
-    int l_aux, m_aux = 0;
-    uint8_t *aux = 0;
-    l_aux = gfa_aux_parse(rest, &aux, &m_aux); // parse optional tags
-    t.sample = gfa_sample_add(g, sample);
-    t.snid = gfa_sseq_add(g, ctg);
-    if (l_aux > 0)
-      t.aux.m_aux = m_aux, t.aux.l_aux = l_aux, t.aux.aux = aux;
-    else if (aux)
-      free(aux);
-    GFA_GROW(gfa_walk_t, g->walk, g->n_walk, g->m_walk);
-    g->walk[g->n_walk++] = t;
-  } else return -1;
-  return 0;
-}
+int gfa_parse_W(gfa_t *g, char *s);
