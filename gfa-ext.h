@@ -12,7 +12,7 @@
 #define GFA_EXT_S
 #define GFA_EXT_W
 
-#if defined(GFA_EXT_S) && !defined(GFA_EXT_AUX)
+#if (defined(GFA_EXT_W) || defined(GFA_EXT_S)) && !defined(GFA_EXT_AUX)
 #define GFA_EXT_AUX
 #endif
 
